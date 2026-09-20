@@ -42,14 +42,16 @@ Keep the same tone as the existing guides:
 
 ## Phase-by-phase guidance for the agent
 
-### Phase 6 — Systems & Papers
-- Create 4–6 modules covering storage, consensus, protocols, and at least one paper re-implementation.
-- Emphasize "read the paper / design notes first, then implement a tiny version".
-- Require reuse of logger, config, taskpool, channels, jsonlite.
+### Phase 6 — Systems & Papers — DONE (reference, do not re-expand)
+
+Phase 6 is fully specified as `phase_06_systems/43_wal_seglog` → `44_kv_store` → `45_http_server_from_tcp` → `46_resp_rpc` → `47_raft_lite` → `48_paper_reimpl`, each with GUIDE/EXERCISES/QUESTIONS/doc.go plus README/NOTES docs. Use it as the quality bar for later phases: staged multi-week milestones, real kill/chaos/failure demos with numbers, exact symbol contracts for the verifier, reuse spine that chains forward, and a capstone (48) with paper-notes + eval + failure matrix + RETRO. ROADMAP.md Phase 6 table is the canonical module list; VERIFIER_GUIDE.md Phase 6 section is the canonical MUST list.
 
 ### Phase 7 — Version Control
-- Structure the journey as successive capabilities (content-addressable store → index → branches → basic porcelain → one modern idea).
+
+### Phase 7 — Version Control
+- Structure the journey as successive capabilities (content-addressable store → index → branches → basic porcelain → merge/GC → one modern idea). ROADMAP.md Phase 7 lists the staged module split (`49–53`) — follow it.
 - Point heavily at Git internals resources and early Git source.
+- Require Phase 6 reuse explicitly: 43-style journaling for the object store, 44-style compaction thinking for GC, 46-style framing for packs. Demand kill-mid-commit recovery demos at the same bar as 43/44.
 - The final artifact should be a separate repository the learner creates.
 
 ### Phase 8 — GUI Framework
@@ -87,6 +89,6 @@ Keep the same tone as the existing guides:
 
 ## When you finish expanding a phase
 
-Update `ROADMAP.md` to mark the phase as "fully specified" and update `VERIFIER_GUIDE.md` with the new MUST checks (same style as the existing ones).
+Update `ROADMAP.md` to mark the phase as "fully specified" (see how Phase 6 was marked: table + seams + shippable + reuse spine), update `VERIFIER_GUIDE.md` with the new MUST checks (same style as the existing ones, including banned imports + reuse counts + required NOTES/README docs), and update `PROGRESS.md` with per-module checkboxes. Phase 6 is the template — match its depth (multi-week milestones, failure/chaos demos with numbers, exact symbol contracts), don't regress to one-paragraph scaffolds.
 
 Keep the overall spirit: long-term deliberate practice, heavy reuse, external study, and regular shipping of real (if simplified) artifacts.

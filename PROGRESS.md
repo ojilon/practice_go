@@ -65,7 +65,13 @@ You maintain this file. Check boxes as you go. Add short notes under any section
 - [ ] 42_final_boss
 
 ## Later phases (fill in as scaffolds are expanded)
-- [ ] Phase 6 modules…
+- [ ] Phase 6 — Systems, Protocols & Papers (fully specified, ~15–20 weeks)
+  - [ ] 43_wal_seglog (segmented WAL: CRC, rotation, kill-test, sync bench)
+  - [ ] 44_kv_store (durable KV on 43: batch, TTL, cache, compaction proof)
+  - [ ] 45_http_server_from_tcp (HTTP/1.1 from net.Conn: curl interop, attack + slow-client demos)
+  - [ ] 46_resp_rpc (RESP subset + multiplexed RPC: pipelining, Raft-shaped seam)
+  - [ ] 47_raft_lite (election + replication over 43+46: TCP cluster, 3× chaos table, RAFT_NOTES)
+  - [ ] 48_paper_reimpl (Dynamo/MR/GFS-lite capstone: PAPER_NOTES + eval + failure matrix + RETRO)
 - [ ] Phase 7 mini-git (own repo)
 - [ ] Phase 8 GUI framework (own repo)
 - [ ] Phase 9 Editor (own repo)

@@ -112,47 +112,50 @@ Everything later **reuses** earlier work the same way Phase 5 reuses Phase 2.
 
 ---
 
-# Extended Journey (Months 3–18) — Scaffold Level
+# Extended Journey (Months 3–18)
 
-> The folders below do **not** yet contain full `00_GUIDE.md` / `01_EXERCISES.md` / `02_QUESTIONS.md`.  
-> They exist as **goals + resource pointers**. A future agent (or you) will expand them using `SCAFFOLD_FOR_FUTURE_AGENTS.md`.
+> Phase 6 is now **fully specified** (`phase_06_systems/43–48`, each with `00_GUIDE.md` / `01_EXERCISES.md` / `02_QUESTIONS.md`).
+> Phases 7+ remain **goals + resource pointers** until a future agent expands them with `SCAFFOLD_FOR_FUTURE_AGENTS.md`.
 
 ---
 
-## Phase 6 — Systems, Protocols & Papers (≈ Months 3–5)
+## Phase 6 — Systems, Protocols & Papers (≈ Months 3–5) — FULLY SPECIFIED
 
-**Goal:** Learn how real systems are designed by implementing simplified versions of papers and classic projects.
+**Goal:** Learn how real systems are designed by implementing simplified-but-operational versions of papers and classic projects: your own log, store, wire protocols, consensus, and one full paper capstone.
 
-**Suggested modules (to be fleshed out):**
-- `43_kv_store` — simple key-value with WAL or append-only log
-- `44_raft_lite` or `paxos_lite` — leader election + log replication (very simplified)
-- `45_http_server_from_tcp` — build a tiny HTTP/1.1 server on net.Conn (no net/http)
-- `46_protocol_parser` — parse a real binary or text protocol (e.g. Redis RESP subset, or a toy RPC)
-- `47_paper_reimpl` — pick one paper from the reading list and implement its core algorithm
+| Module | Folder / package | Weeks | What ships |
+|--------|------------------|-------|------------|
+| 43 Segmented WAL | `phase_06_systems/43_wal_seglog` (`walseglog`) | 2.5–3.5 | Crash-safe segmented log: CRC framing, rotation, truncation, Replay, kill-test + sync bench |
+| 44 Durable KV | `phase_06_systems/44_kv_store` (`kvstore`) | 3–4 | Bitcask/LSM-lite on 43: batches, TTL, LRU, compaction with before/after proof, CLI + bench |
+| 45 Raw HTTP | `phase_06_systems/45_http_server_from_tcp` (`httpraw`) | 2–3 | HTTP/1.1 from `net.Conn` (no `net/http`): keep-alive, chunked, router, timeouts, KV service, attack + slow-client demos |
+| 46 RESP + RPC | `phase_06_systems/46_resp_rpc` (`resprpc`) | 1.5–2.5 | RESP2 subset fronting 44 + length-prefixed multiplexed RPC (the 47 transport), pipelining + atomic-INCR proofs |
+| 47 Raft-lite | `phase_06_systems/47_raft_lite` (`raftlite`) | 3.5–4.5 | Election + replication + commit/apply over 43+46, TCP cluster, 4-scenario chaos table passing 3× |
+| 48 Paper capstone | `phase_06_systems/48_paper_reimpl` (`paperreimpl`) | 3–4 | ONE of Dynamo-lite / MapReduce-lite / GFS-lite with PAPER_NOTES + eval + failure matrix + RETRO |
 
-**Resources to start from (do not copy blindly — extract ideas):**
+**Order matters:** 43 → 44 → 45 → 46 → 47 → 48. Each module's GUIDE names the exact seam the next one consumes (`Replay`, `Open/Put/Get`, `ServeKV`, `RPCServer`, cluster helpers).
+
+**Shippable definition:** every module has a runnable CLI/bench demo + README with real numbers from your machine; 47's chaos table and 48's eval+failure tables are the Phase 6 diploma.
+
+**Reuse spine:** logger, config/ini, taskpool, scheduler, cache, jsonlite, channels — plus 43→44→45/46→47→48 chaining. Every module documents ≥ (growing) reuses; 48 requires ≥6.
+
+**Resources (primary sources, per-module GUIDEs add more):**
 - "In Search of an Understandable Consensus Algorithm" (Raft paper)
-- Redis design notes / RESP protocol
-- SQLite architecture overview (for the idea of a simple storage engine)
-- "The Log: What every software engineer should know about real-time data's unifying abstraction"
-
-**Shippable definition:** At least two modules that can be demonstrated end-to-end and have their own short README.
-
-**Reuse:** Your logger, taskpool, config, jsonlite, channels, etc.
+- Dynamo (SOSP'07), MapReduce (OSDI'04), GFS (SOSP'03) — one fully re-implemented in 48
+- Redis RESP spec; Bitcask paper; SQLite architecture overview
+- "The Log" (Kreps); RFC 9110/9112 framing chapters; Kafka segment design notes
 
 ---
 
-## Phase 7 — Version Control From First Principles (≈ Months 5–7)
+## Phase 7 — Version Control From First Principles (≈ Months 5–7) — SCAFFOLD
 
-**Goal:** Understand Git by rebuilding a usable subset, then add a few modern ideas.
+**Goal:** Understand Git by rebuilding a usable subset, then add a few modern ideas. Builds directly on Phase 6: your 43 log becomes the object store journal, your 44 compaction thinking becomes GC, your 46 framing becomes the pack format.
 
-**Core journey:**
-1. Content-addressable storage (blobs, trees, commits)
-2. Index / staging area
-3. Branches & HEAD
-4. Basic `add`, `commit`, `log`, `checkout`, `status`, `diff`
-5. Simple merge (or at least detect conflicts)
-6. Stretch modern features: better status, partial ideas from sparse-checkout, or a simple hook system
+**Staged journey (future agent: expand into ~6 modules, each with GUIDE/EXERCISES/QUESTIONS):**
+1. `49_cas_store` (2 wks) — blobs/trees/commits, SHA-256 addressing, zlib-lite or stored-raw objects, `hash-object`/`cat-file` equivalents + corruption scrub.
+2. `50_index_status` (2 wks) — index/staging (mtime+size cache), `.ignore` via your tokenizer, `status`/`diff` (reuse Myers-lite or simple LCS + your sort/hashmap).
+3. `51_branches_porcelain` (2–3 wks) — refs/HEAD, `commit/log/checkout/branch`, CLI with your 41 patterns, file-locking for ref updates.
+4. `52_merge_gc` (2 wks) — 3-way merge + conflict markers, pack/ delta-lite + `gc` (explicit nod to 44 compaction), hooks-lite + sparse-checkout-lite stretch.
+5. `53_modern_capstone` (2 wks) — ONE modern idea shipped: partial clone / virtual FS overlay / GUI status view (pre-arms Phase 8) / editor integration stub (pre-arms Phase 9).
 
 **Resources:**
 - Official Git source (especially the early parts of `git/object.c`, `read-cache.c`)
@@ -160,24 +163,24 @@ Everything later **reuses** earlier work the same way Phase 5 reuses Phase 2.
 - libgit2 documentation (concepts, not the C API)
 - "Git from the Bottom Up"
 - Papers / talks on content-addressable storage
+- Your Phase 6 READMEs (storage + protocol lessons to reuse, not relearn)
 
-**Shippable definition:** A CLI tool that can initialize a repo, commit files, show history, and switch branches on a small project. Put it in its own GitHub repo.
+**Shippable definition:** A CLI tool that can initialize a repo, commit files, show history, and switch branches on a small project. Put it in its own GitHub repo. Must survive kill-mid-commit and prove it with a recovery demo (same standard as 43/44).
 
-**Reuse:** Your previous CLI, logger, config, tokenizer (for ignore patterns), set/hashmap, etc.
+**Reuse:** Your previous CLI, logger, config, tokenizer (for ignore patterns), set/hashmap, 43 WAL ideas, 44 compaction ideas, 46 framing for packs.
 
 ---
 
-## Phase 8 — GUI Framework Journey (≈ Months 7–9, 3–6 focused weeks)
+## Phase 8 — GUI Framework Journey (≈ Months 7–9, 3–6 focused weeks) — SCAFFOLD
 
-**Goal:** Build a small retained-mode or immediate-mode GUI toolkit that is good enough to host real applications.
+**Goal:** Build a small retained-mode or immediate-mode GUI toolkit that is good enough to host real applications (first client: the Phase 9 editor; second client: a Phase 7 status viewer).
 
-**Suggested path:**
-1. Window + event loop (platform backend or pure-Go with a known library for the hard parts)
-2. Basic widgets: button, label, text input, list, scroll
-3. Layout system (row/column or simple constraints)
-4. Drawing primitives + text rendering
-5. Focus, keyboard, mouse handling
-6. Theme / style separation
+**Staged path (future agent: expand into ~5 modules):**
+1. `54_window_loop` (1 wk) — window + event loop. Choose ONE backend and document why: platform (Win32/X11) raw, or pure-Go on top of Gio/Fyne/GLFW for the hard parts. Frame budget + input-event queue + shutdown discipline.
+2. `55_widgets_draw` (1–2 wks) — button, label, text input, list, scroll; drawing primitives + text rendering (font atlas or system text — document choice).
+3. `56_layout_input` (1 wk) — row/column (or constraint-lite) layout, focus/keyboard/mouse routing, clipboard stub, DPI/scale note.
+4. `57_theming_perf` (1 wk) — theme/style separation, dirty-rect/redraw budget, 60fps list-scroll bench with 10k rows, accessibility-lite (keyboard-only operation proof).
+5. `58_gui_capstone` (1 wk) — library + 3 demos (counter, form with validation, virtualized list viewer over your 44 KV). Own repo. "What I simplified" doc required.
 
 **Resources (study designs, do not paste):**
 - Gio (Go immediate-mode) design notes & source
@@ -186,15 +189,27 @@ Everything later **reuses** earlier work the same way Phase 5 reuses Phase 2.
 - "The GUI Toolkit" design discussions in various open-source projects
 - Platform docs (Win32, X11/Wayland, or cross-platform abstractions)
 
-**Shippable definition:** A small library + demo apps (button counter, form, list viewer). Own repository. Document what you deliberately simplified.
+**Shippable definition:** A small library + demo apps (button counter, form, list viewer). Own repository. Document what you deliberately simplified. List viewer must page through 10k KV rows without UI freeze (taskpool background load — reuse from 25/44).
 
-**Reuse:** Event system, logger, config, taskpool (for background work), your earlier packages where they fit.
+**Reuse:** Event system, logger, config, taskpool (for background work), your earlier packages where they fit. Phase 7 status data as a demo data source.
 
 ---
 
-## Phase 9 — Editor Built on Your Stack (≈ Months 9–11)
+## Phase 9 — Editor Built on Your Stack (≈ Months 9–11) — SCAFFOLD
 
-**Goal:** A usable text editor that *uses* the GUI framework + previous tools.
+**Goal:** A usable text editor that *uses* the GUI framework + previous tools. You must dogfood it: from the first multi-buffer milestone, all Phase 10+ notes and code get edited in it at least once a week.
+
+**Staged path (future agent: expand into ~5 modules):**
+1. `59_buffer_core` (2 wks) — gap buffer vs piece table vs rope: learner researches, benchmarks insert/delete on 1MB file, CHOOSES with numbers. Undo/redo (grouped), save with atomic rename + fsync (43/44 durability lesson reused).
+2. `60_view_highlight` (2 wks) — multi-buffer, viewport + soft-wrap, syntax highlight for Go via your 32 tokenizer (extended), search/replace (literal + regex-lite), config via your 21 system.
+3. `61_git_integration` (1–2 wks) — mini-git status/stage/commit/diff pane against Phase 7 CLI-as-library, conflict-marker navigation (from 52), large-file guard.
+4. `62_lsp_perf` (1–2 wks) — diagnostics via `go vet` subprocess or LSP-stdio skim client; 100k-line file open/scroll bench; startup-time budget + plugin-hook stub.
+5. `63_editor_ship` (1 wk) — keymap docs, crash-recovery (swap-file/undo-persist proof by kill test — same bar as 43), README with arch diagram.
+
+**Resources:**
+- Source of small editors (e.g. micro, helix concepts, early vim, or pure-Go editors)
+- Text buffer data structures papers (piece table, rope, gap buffer)
+- LSP specification (skim)
 
 **Must have:**
 - Multi-buffer / multi-file
@@ -209,44 +224,38 @@ Everything later **reuses** earlier work the same way Phase 5 reuses Phase 2.
 - Split panes
 - Plugin-style extension points
 
-**Resources:**
-- Source of small editors (e.g. micro, helix concepts, early vim, or pure-Go editors)
-- Text buffer data structures papers (piece table, rope, gap buffer)
-- LSP specification (skim)
-
-**Shippable definition:** You can open, edit, save, and commit a real project with it. Own repository. README shows architecture diagram and which of *your* packages it depends on.
+**Shippable definition:** You can open, edit, save, and commit a real project with it. Own repository. README shows architecture diagram and which of *your* packages it depends on. Kill-mid-edit recovery demo required.
 
 ---
 
-## Phase 10 — Productization & Feedback Loop (≈ Months 11–14)
+## Phase 10 — Productization & Feedback Loop (≈ Months 11–14) — SCAFFOLD
 
-**Goal:** Turn the best previous projects into proper, shippable repositories and improve them by *using* them.
+**Goal:** Turn the best previous projects into proper, shippable repositories and improve them by *using* them. Output is public artifacts + a maintained best-practices file, not just more code.
 
-**Activities:**
-- Extract the strongest packages into their own Go modules / repos
-- Write proper READMEs, examples, and basic tests
-- Use the editor + mini-git daily on the practice_go repo itself
-- Collect best practices from the open-source projects you studied (keep a living `BEST_PRACTICES.md`)
-- Improve performance / UX of the GUI and editor based on real use
-- Add packaging / release scripts (or at least documented build steps)
+**Staged activities (future agent: expand into ~4 modules with checklists, not just prose):**
+1. `64_extract_harden` (2–3 wks) — pick 3 packages (expected: 44 KV, 46 RPC, 43 log OR 47 cluster) → independent Go modules with semver tags, examples/, `go vet`+race CI stub, fuzz seed corpus for protocol parsers (45/46).
+2. `65_docs_release` (1–2 wks) — READMEs a stranger can follow (install → run → bench → failure demo), CHANGELOG, build/release scripts or documented steps, issue-template + roadmap per repo.
+3. `66_dogfood_loop` (ongoing) — use editor + mini-git daily on this repo; file ≥10 friction notes; fix ≥5 with measured before/after (startup ms, scroll fps, commit time, bench ops/s). Keep living `BEST_PRACTICES.md` (pattern → where seen → why kept/rejected → where applied).
+4. `67_perf_pass` (2 wks) — profile-guided pass on KV + GUI list + editor buffer: `pprof` CPU + alloc, bench tables before/after, compaction/GC pause note, slow-client/load re-runs proving no regression.
 
-**Shippable definition:** At least 3 independent repositories that a stranger could clone and run, plus a short "lessons learned" document.
+**Shippable definition:** At least 3 independent repositories that a stranger could clone and run, plus a short "lessons learned" document. Each repo's README must contain the same proof trio Phase 6 taught: bench numbers + failure demo + reuse map.
 
 ---
 
-## Phase 11+ — Capstones & Depth (Months 14–18)
+## Phase 11+ — Capstones & Depth (Months 14–18) — SCAFFOLD (expanded menu)
 
-Pick **2–3** larger projects. Examples (choose or invent):
+Pick **2–3** larger projects. Each must reuse ≥5 earlier packages, require new external reading, and reach show-in-public quality with bench + failure + reuse proofs (the 48 template applies unchanged).
 
-- Distributed toy system (using your Raft/KV ideas)
-- Domain-specific tool (e.g. static site generator, build system, or game with the GUI)
-- Re-implementation of a classic paper at higher fidelity
-- Contribution-ready open-source style project that reuses your stack heavily
+**Menu (future agent: expand each chosen capstone into a 48-style GUIDE with Track/Notes/Eval/Failure/CLI):**
 
-Each capstone should:
-- Force reuse of ≥5 earlier packages
-- Require reading new external material
-- Reach a state where you would be comfortable showing it publicly
+- **C1 Distributed toy system** — Raft-KV cluster (47+44) behind your raw HTTP (45) with Dynamo-style read-repair stretch; chaos suite extended to 6 scenarios; 3-node localhost + Docker-compose-lite deploy note.
+- **C2 Build system / static site generator** — content hashing (7 CAS ideas), incremental rebuild graph (31 graph + 25 pool), file watcher (42 patterns), RESP/HTTP status server (45/46); must rebuild this repo's docs incrementally as the demo.
+- **C3 Multiplayer / realtime game on your GUI** — authoritative tick (24 scheduler), snapshot interpolation, toy netcode over 46 RPC (loss/drop simulator from 47 chaos), 60fps GUI (58) stress with 500 entities.
+- **C4 Time-series / OLAP-lite engine** — columnar segment files (43 segment ideas + 44 compaction), Gorilla-style float compression (paper re-impl #2), SQL-subset parser (38 + 32), bench vs SQLite on 10M points.
+- **C5 Classic paper #2 at higher fidelity** — Bitcask→full LSM (Bloom + levels), Raft→snapshots + joint-consensus membership change, or GFS→HDFS-compatible mini-namenode; must include the evaluation section the original paper had, rerun at your scale.
+- **C6 Contribution-ready OSS project** — take one Phase 10 repo to "accepts external PRs" bar: API docs, compatibility promise, fuzz + race CI, 3 good-first-issues, one external-user test note.
+
+Each capstone ships in its own repo with `PAPER_OR_DESIGN_NOTES.md`, eval tables, failure matrix, and a 5-minute live-demo script (the 48 `Demo()` discipline, reused).
 
 ---
 

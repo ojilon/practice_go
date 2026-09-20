@@ -51,10 +51,11 @@ HTTP API, parsers, scraper, TUI, CLI, final boss — all on *your* stack.
 
 ---
 
-## Layer 4 — Systems & papers (Phase 6)
+## Layer 4 — Systems & papers (Phase 6 — fully specified)
 
-KV store, consensus lite, protocol parsers, paper re-implementations.  
-Must reuse logger, config, channels, taskpool, jsonlite, etc.
+`43_wal_seglog` → `44_kv_store` → `45_http_server_from_tcp` → `46_resp_rpc` → `47_raft_lite` → `48_paper_reimpl`.
+43 is the log everything trusts; 44 persists via 43; 45 serves 44 over raw TCP; 46 fronts 44 (RESP) and carries 47 (RPC); 47 replicates via 43+46 into a 44-shaped state machine; 48 composes ≥6 packages on one paper track.
+Must reuse logger, config, channels, taskpool, jsonlite, cache, scheduler, etc. — each module's GUIDE names the exact spine.
 
 ---
 
