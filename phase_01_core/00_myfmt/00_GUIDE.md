@@ -1,30 +1,81 @@
 # myfmt — Your Own Mini fmt — Guide (`myfmt`)
 
-> Folder: `phase_01_core/00_myfmt` · Package: `myfmt` · Run via root `main.go` (verifier ignores `main.go`).
-> Prerequisite reading: `core_notes/01_variables_functions.md`. Do this FIRST — it earns you the right to use `fmt` for debug everywhere else.
+> Folder: `phase_01_core/00_myfmt`  
+> Package name: `myfmt`  
+> Run via root `main.go` (the verifier always ignores `main.go`)  
+> Prerequisite: read `core_notes/01_variables_functions.md` first.
+
+This is the **first real exercise**. Completing it earns you the right to use the real `fmt` package for debug printing everywhere else in the dojo.
+
+---
 
 ## Why this exists
-`fmt` is the one stdlib package allowed for debug printing — but only because you prove here you understand what it does. Build a tiny, practice-grade subset from core only (no `fmt`/`strconv`/`strings` imports in impl files; demos may use `fmt` to compare outputs).
 
-## Steps (simple → complex)
-1. `Itoa`/`Atoi`-lite: int↔string with sign + error on bad input (see `01_EXERCISES.md` E1).
-2. `Print`/`Println`-lite writing to any `io.Writer` (default: `os.Stdout`), space-separation like `fmt`.
-3. `Sprintf`-lite supporting `%s %d %v %%` only. Unknown verbs → keep literally (e.g. `%q` stays as-is) + document the limitation.
-4. Concat/bytes discipline: build with `[]byte` append, single final `Write` (no `+` in a loop).
+Almost every program needs to turn values into text. The real `fmt` package does a lot of sophisticated work. Here you rebuild a tiny, practice-grade subset so you understand the basic mechanics:
 
-## How to run (example — adapt)
+- turning integers into decimal strings (and back)
+- writing text to an `io.Writer`
+- a very limited form of formatted printing
+
+You are **not** allowed to import `fmt`, `strconv`, `strings`, or `bytes` in your implementation files. Demos may import the real `fmt` only to compare your output side-by-side.
+
+---
+
+## What you will build (simple → complex)
+
+1. **Itoa / Atoi lite**  
+   Convert `int` ↔ decimal string. Handle the sign. Return a clear error on invalid input for Atoi.
+
+2. **Print / Println / Fprint lite**  
+   Accept any `io.Writer` (default to `os.Stdout`). Separate arguments with spaces the way `fmt` does. Println adds a final newline. Prefer a single `Write` call at the end.
+
+3. **Sprintf lite**  
+   Support only these verbs: `%s`, `%d`, `%v`, `%%`.  
+   Unknown verbs should be left as-is (document this limitation).  
+   Build the result with `[]byte` appends; avoid string `+` inside a loop.
+
+4. **Discipline**  
+   Keep the implementation small and readable. Edge cases matter more than fancy features.
+
+Full task list and required symbols are in `01_EXERCISES.md`.
+
+---
+
+## How to run while developing
+
+Temporarily change root `main.go` to something like:
+
 ```go
-// root main.go (TEMPORARY, verifier ignores it)
 package main
-import ("fmt"; "practice_go/phase_01_core/00_myfmt")
-func main() { fmt.Println(myfmt.Sprintf("%s=%d", "n", 42)) }
+
+import (
+	"fmt"
+	"practice_go/phase_01_core/00_myfmt"
+)
+
+func main() {
+	fmt.Println(myfmt.Sprintf("%s=%d", "n", 42)) // should print n=42
+}
 ```
-```powershell
+
+Then from the repo root:
+
+```bash
 go run .
 go vet ./phase_01_core/00_myfmt/...
 ```
 
+When you are finished with the folder, you can leave `main.go` however you like — the verifier never looks at it.
+
+---
+
 ## Done when
-- All `01_EXERCISES.md` symbols exist; `Sprintf("%s=%d", "n", 42)` → `"n=42"`.
-- `02_QUESTIONS.md` boxes filled.
-- Downstream you may use `fmt` for debug — but `18_logger` formatting logic must be YOURS (see `BUILD_CHAIN.md`).
+
+- Every symbol required by `01_EXERCISES.md` exists and behaves correctly on the stated edge cases.
+- `Sprintf("%s=%d", "n", 42)` produces `"n=42"`.
+- All answer boxes in `02_QUESTIONS.md` are filled.
+- `go vet ./phase_01_core/00_myfmt/...` is clean.
+- You understand why the real `fmt` package is more complex than what you just built.
+
+After this folder you may freely use the real `fmt` for debug output.  
+However, any formatting logic that belongs inside later packages you build yourself (especially the logger) must still be *your* code — see `BUILD_CHAIN.md`.
