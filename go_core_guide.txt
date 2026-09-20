@@ -1,0 +1,29 @@
+If I were designing a "core Go only" journey, I'd do something like:
+
+Variables and functions
+Structs
+Methods
+Slices
+Maps
+Interfaces
+Error handling
+Pointers
+Goroutines
+Channels
+
+Then build increasingly capable packages:
+
+📦 math2 (vectors, matrices)
+📦 list (linked list)
+📦 stack
+📦 queue
+📦 set
+📦 ringbuffer
+📦 logger
+📦 event
+📦 cache
+📦 config
+📦 ini
+📦 jsonlite (a simplified serializer)
+📦 scheduler
+📦 taskpool
