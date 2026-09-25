@@ -53,6 +53,60 @@ func Itoa(n int) string {
 	return string(buf)
 }
 
-func Atoi(s string) int {
-	return 0
+// brief error implementation
+type myerror struct {
+	s string
+}
+
+func (e *myerror) Error() string {
+	return e.s
+}
+
+func myNew(text string) error {
+	return &myerror{text}
+}
+
+func Atoi(s string) (int, error) {
+
+	if len(s) == 0 {
+		return 0, myNew("empty string")
+	}
+
+	sign := 1
+	start := 0
+
+	//check for the leading sign
+	// if there is a sign, the iteration starts from the next position
+	if s[0] == '-' {
+		sign = -1
+		start = 1
+	} else if s[0] == '+' {
+		start = 1
+	}
+
+	if start == len(s) {
+		return 0, myNew("only sign entred")
+	}
+
+	//convert every char to corresponding integer
+	n := 0
+	for i := start; i < len(s); i++ {
+		ch := s[i]
+
+		//check is character is not a valid int
+		if ch < '0' || ch > '9' {
+			return 0, myNew("One of the characters does not become a valid int")
+		}
+
+		//obtain the integer value
+		integer_value := int(ch - '0')
+
+		//shift the previous digits to the left by multipying by 10
+		n *= 10
+
+		//add the next integer value
+		n += integer_value
+
+	}
+	return n * sign, nil
 }
